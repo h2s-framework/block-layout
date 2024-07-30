@@ -1,0 +1,53 @@
+id: BlockLayout
+arguments:
+  \Siarko\BlockLayout\XmlLayoutParser:
+    pathProviderPool: \Siarko\Paths\Provider\Pool\ScopedPathProviderPool
+  \Siarko\BlockLayout\ModifierLayout\Type\ModifierTypeProvider:
+    types:
+      includeLayout: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\IncludeLayoutModifier
+      block: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\BlockModifier
+      referenceBlock: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\ReferenceBlockModifier
+      delete: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\DeleteModifier
+      css: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\CssModifier
+      js: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\JsModifier
+      title: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\TitleModifier
+      base: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\BaseModifier
+  \Siarko\BlockLayout\Block:
+    pathProviderPool: \Siarko\Paths\Provider\Pool\PathProviderPool
+    renderResultModifiers:
+      - \Siarko\BlockLayout\Template\RenderResultModifier\BlockTagResolver
+  \Siarko\BlockLayout\Definitions\TagParserManager:
+    parsers:
+      block: \Siarko\BlockLayout\Definitions\Builtin\Block
+      referenceBlock: \Siarko\BlockLayout\Definitions\Builtin\ReferenceBlock
+      title: \Siarko\BlockLayout\Definitions\Builtin\Title
+      base: \Siarko\BlockLayout\Definitions\Builtin\Base
+      js: \Siarko\BlockLayout\Definitions\Builtin\Js
+      css: \Siarko\BlockLayout\Definitions\Builtin\Css
+      includeLayout: \Siarko\BlockLayout\Definitions\Builtin\IncludeLayout
+      delete: \Siarko\BlockLayout\Definitions\Builtin\Delete
+  \Siarko\BlockLayout\Template\DataNodeVariableParser:
+    valueProviders:
+      - \Siarko\BlockLayout\Template\Variable\BaseUrlVariableProvider
+  # Template provider for builtin custom blocks (module-relative paths)
+  \Siarko\Paths\Provider\Pool\PathProviderPool:
+    providers:
+      template:
+        - \Siarko\BlockLayout\Template\BuiltinTemplatePathProvider
+  \Siarko\BlockLayout\Blocks\BuiltinBlock:
+    templatePathProviders:
+      - \Siarko\BlockLayout\Template\BuiltinTemplatePathProvider
+  # Definition of block types
+  \Siarko\BlockLayout\Layout:
+    extraBlockTypeMap:
+      block: \Siarko\BlockLayout\Block
+      css: \Siarko\BlockLayout\Blocks\CssLink
+      js: \Siarko\BlockLayout\Blocks\JsBlock
+      title: \Siarko\BlockLayout\Blocks\Title
+      base: \Siarko\BlockLayout\Blocks\BaseUrl
+
+  \Siarko\Modules\Paths\ModulePathsProvider:
+    pathTypes:
+      layout: View/Layout
+      template: View/Block
+      assets: View/assets
