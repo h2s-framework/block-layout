@@ -1,5 +1,5 @@
 {
-  "name": "siarkowodor/h2s-block-layout",
+  "name": "h2sf/block-layout",
   "description": "description",
   "minimum-stability": "stable",
   "license": "proprietary",
@@ -12,9 +12,9 @@
     }
   ],
   "require": {
-    "siarkowodor/h2s-dependency-manager": "*",
-    "siarkowodor/h2s-assets": "^0.1.0",
-    "siarkowodor/h2s-translations": "*",
+    "h2sf/dependency-manager": "*",
+    "h2sf/assets": "^0.1.0",
+    "h2sf/translations": "*",
     "ext-simplexml": "*"
   },
   "autoload": {
