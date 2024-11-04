@@ -1,5 +1,26 @@
 id: BlockLayout
+module: Core.BlockLayout
+
+plugins:
+  \Siarko\ActionRouting\ActionManager: \Siarko\BlockLayout\ControllerRouting\Plugin\ActionLayouts
+
+types:
+  \Siarko\BlockLayout\Api\LayoutProviderInterface: \Siarko\BlockLayout\LayoutProvider
+  V\Siarko\BlockLayout\Cache\Layout: !new \Siarko\CacheFiles\Api\CacheSetInterface
+  V\Siarko\BlockLayout\Cache\Layout\DirectoryProvider: !new \Siarko\Paths\Provider\ProjectPathProvider
 arguments:
+  # Cache configuration
+  V\Siarko\BlockLayout\Cache\Layout\DirectoryProvider:
+    path: generated/cache/layout
+  V\Siarko\BlockLayout\Cache\Layout:
+    cacheDirectory: V\Siarko\BlockLayout\Cache\Layout\DirectoryProvider
+  # Add cache to the cache manager
+  \Siarko\BlockLayout\Manager:
+    caches:
+      layout: V\Siarko\BlockLayout\Cache\Layout
+  \Siarko\BlockLayout\LayoutProvider:
+    configCache: V\Siarko\BlockLayout\Cache\Layout
+
   \Siarko\BlockLayout\XmlLayoutParser:
     pathProviderPool: \Siarko\Paths\Provider\Pool\ScopedPathProviderPool
   \Siarko\BlockLayout\ModifierLayout\Type\ModifierTypeProvider:
@@ -16,6 +37,9 @@ arguments:
     pathProviderPool: \Siarko\Paths\Provider\Pool\PathProviderPool
     renderResultModifiers:
       - \Siarko\BlockLayout\Template\RenderResultModifier\BlockTagResolver
+  \Siarko\BlockLayout\Template\ContextualLoader:
+    data:
+        url: !type:object \Siarko\BlockLayout\Template\Tools\Url
   \Siarko\BlockLayout\Definitions\TagParserManager:
     parsers:
       block: \Siarko\BlockLayout\Definitions\Builtin\Block

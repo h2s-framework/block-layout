@@ -3,6 +3,7 @@
 namespace Siarko\BlockLayout\Template;
 
 use Siarko\DependencyManager\DependencyManager;
+use Siarko\Serialization\Api\Attribute\Serializable;
 use Siarko\Utils\Exceptions\TypeCastException;
 use Siarko\Utils\TypeManager;
 
@@ -18,9 +19,9 @@ class DataNode
      * @param TypeManager $typeManager
      */
     public function __construct(
-        protected string $name,
-        protected string $type,
-        protected string $value,
+        #[Serializable] protected string $name,
+        #[Serializable] protected string $type,
+        #[Serializable] protected string $value,
         protected DependencyManager $dependencyManager,
         protected readonly DataNodeVariableParser $nodeVariableParser,
         protected readonly TypeManager $typeManager

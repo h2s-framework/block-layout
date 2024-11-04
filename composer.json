@@ -4,6 +4,7 @@
   "minimum-stability": "stable",
   "license": "proprietary",
   "type": "library",
+  "version": "0.1.1",
   "authors": [
     {
       "name": "H2S",
@@ -11,9 +12,10 @@
     }
   ],
   "require": {
-    "h2sf/dependency-manager": "*",
-    "h2sf/assets": "^0.1.0",
-    "h2sf/translations": "*",
+    "h2sf/dependency-manager": "^0.1.1",
+    "h2sf/assets": "^0.1.2",
+    "h2sf/plugins": "^0.1",
+    "h2sf/translations": "^0.1.1",
     "ext-simplexml": "*"
   },
   "autoload": {

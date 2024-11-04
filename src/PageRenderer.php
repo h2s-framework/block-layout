@@ -2,6 +2,7 @@
 
 namespace Siarko\BlockLayout;
 
+use Siarko\BlockLayout\Api\LayoutProviderInterface;
 use Siarko\BlockLayout\Exception\BlockDataTypeNotSet;
 use Siarko\BlockLayout\Exception\LayoutNotExists;
 use Siarko\BlockLayout\Exception\RootBlockNotFound;
@@ -14,24 +15,24 @@ class PageRenderer
     public const CURRENT_LAYOUT_TYPE_NAME = '$CURRENT_LAYOUT';
 
     /**
-     * @param XmlLayoutParser $xmlLayoutParser
      * @param LayoutFactory $layoutFactory
      * @param DependencyManager $dependencyManager
+     * @param LayoutProviderInterface $layoutProvider
      */
     public function __construct(
-        private readonly XmlLayoutParser $xmlLayoutParser,
         private readonly LayoutFactory $layoutFactory,
-        private readonly DependencyManager $dependencyManager
+        private readonly DependencyManager $dependencyManager,
+        private readonly LayoutProviderInterface $layoutProvider
     )
     {
     }
 
     /**
-     * @return XmlLayoutParser
+     * @return LayoutProviderInterface
      */
-    public function getLayoutParser(): XmlLayoutParser
+    public function getLayoutProvider(): LayoutProviderInterface
     {
-        return $this->xmlLayoutParser;
+        return $this->layoutProvider;
     }
 
     /**
@@ -44,7 +45,7 @@ class PageRenderer
     {
         $layout = $this->layoutFactory->create();
         $this->dependencyManager->bindObject(self::CURRENT_LAYOUT_TYPE_NAME, $layout);
-        $layoutData = $this->xmlLayoutParser->loadLayout();
+        $layoutData = $this->layoutProvider->getData();
         $layout->setLayoutStructure($layoutData);
         echo $layout->render();
     }

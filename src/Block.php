@@ -2,7 +2,7 @@
 
 namespace Siarko\BlockLayout;
 
-use Siarko\BlockLayout\Argument\BlockArgumentInterface;
+use Siarko\BlockLayout\Argument\BlockAwareArgumentInterface;
 use Siarko\BlockLayout\Exception\TemplateFileNotFound;
 use Siarko\BlockLayout\Template\ContextualLoader;
 use Siarko\BlockLayout\Template\ContextualLoaderFactory;
@@ -11,6 +11,7 @@ use Siarko\BlockLayout\Template\DataNodeFactory;
 use Siarko\BlockLayout\Template\RenderResultModifier\RenderResultModifierInterface;
 use Siarko\DependencyManager\DependencyManager;
 use Siarko\Paths\Api\Provider\Pool\PathProviderPoolInterface;
+use Siarko\Paths\Exception\RootPathNotSet;
 use Siarko\UrlService\UrlProvider;
 
 class Block
@@ -33,6 +34,7 @@ class Block
      * @param array $childBlockIds
      * @param string|null $template
      * @param array|DataNode $data
+     * @throws RootPathNotSet
      */
     public function __construct(
         protected readonly string                    $id,
@@ -240,12 +242,12 @@ class Block
     }
 
     /**
-     * Bind all arguments which implement BlockArgumentInterface to $this block
+     * Bind all arguments which implement BlockAwareArgumentInterface to $this block
      */
     protected function bindArgumentObjects()
     {
         foreach ($this->templateData as $argument) {
-            if ($argument instanceof BlockArgumentInterface) {
+            if ($argument instanceof BlockAwareArgumentInterface) {
                 $argument->setBlock($this);
             }
         }

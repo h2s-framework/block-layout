@@ -2,11 +2,11 @@
 
 namespace Siarko\BlockLayout;
 
+use Siarko\Api\State\AppStateInterface;
 use Siarko\BlockLayout\Definitions\Builtin\IncludeLayout;
 use Siarko\BlockLayout\Definitions\TagParserManager;
 use Siarko\BlockLayout\ModifierLayout\Applier;
 use Siarko\BlockLayout\Template\DataNodeFactory;
-use Siarko\DependencyManager\DependencyManager;
 use Siarko\Paths\Provider\Pool\PathProviderPool;
 use Siarko\Paths\Api\Provider\Pool\PathProviderPoolInterface;
 
@@ -24,19 +24,20 @@ class XmlLayoutParser
     private array $enabledModifierLayouts = [];
 
     /**
-     * @param DependencyManager $dependencyManager
      * @param PathProviderPool $pathProviderPool
      * @param Applier $modifierApplier
      * @param DataNodeFactory $dataNodeFactory
      * @param TagParserManager $parserManager
-     * @param string $defaultLayoutId
+     * @param AppStateInterface $appState
+     * @param string $baseLayoutId
      */
     public function __construct(
         private readonly PathProviderPoolInterface $pathProviderPool,
         private readonly Applier                   $modifierApplier,
         protected readonly DataNodeFactory         $dataNodeFactory,
         protected readonly TagParserManager        $parserManager,
-        protected string                           $defaultLayoutId = self::DEFAULT_LAYOUT_ID
+        protected readonly AppStateInterface $appState,
+        protected string $baseLayoutId = self::DEFAULT_LAYOUT_ID
     )
     {
     }
@@ -45,9 +46,9 @@ class XmlLayoutParser
      * @param string $layoutId
      * @return void
      */
-    public function setDefaultLayoutId(string $layoutId): void
+    public function setBaseLayoutId(string $layoutId): void
     {
-        $this->defaultLayoutId = $layoutId;
+        $this->baseLayoutId = $layoutId;
     }
 
     /**
@@ -74,6 +75,17 @@ class XmlLayoutParser
         $this->enableModifierLayouts([$layoutId]);
     }
 
+    /**
+     * @return string
+     */
+    public function getLayoutSignature(): string
+    {
+        $path = $this->appState->getAppScope().'.'.
+            $this->baseLayoutId.'_'.
+            implode('_', $this->enabledModifierLayouts);
+        return str_replace('/', '-', $path);
+    }
+
 
     /**
      * @return array
@@ -90,7 +102,7 @@ class XmlLayoutParser
             }
             $modifierLayoutData[$modifierLayout] = $loadedModifier;
         }
-        return $this->applyLayoutUpdates($this->loadMergedLayouts($this->defaultLayoutId), $modifierLayoutData);
+        return $this->applyLayoutUpdates($this->loadMergedLayouts($this->baseLayoutId), $modifierLayoutData);
     }
 
     /**
