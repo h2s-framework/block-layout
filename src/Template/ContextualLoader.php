@@ -3,7 +3,7 @@
 namespace Siarko\BlockLayout\Template;
 
 use Siarko\BlockLayout\Exception\TemplateFileNotFound;
-use Siarko\BlockLayout\Template\CallHandler\CallHandlerInterface;
+use Siarko\BlockLayout\Api\Template\CallHandlerInterface;
 
 class ContextualLoader
 {

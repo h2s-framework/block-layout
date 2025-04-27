@@ -6,7 +6,7 @@ class TagData
 {
 
     public const ID = 'id';
-    public const CHILDREN = 'children';
+    public const CHILDREN = 'childrenIds';
 
     /**
      * @param string $type
@@ -72,26 +72,21 @@ class TagData
     }
 
     /**
-     * @param string $type
      * @param string $id
      */
-    public function addChild(string $type, string $id): void
+    public function addChild(string $id): void
     {
-        if (!array_key_exists($type, $this->children)) {
-            $this->children[$type] = [];
-        }
-        $this->children[$type][] = $id;
+        $this->children[] = $id;
     }
 
     /**
-     * @param string $type
      * @param array $ids
      * @return void
      */
-    public function addChildren(string $type, array $ids): void
+    public function addChildren(array $ids): void
     {
         foreach ($ids as $id) {
-            $this->addChild($type, $id);
+            $this->addChild($id);
         }
     }
 

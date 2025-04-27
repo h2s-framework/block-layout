@@ -4,8 +4,8 @@ namespace Siarko\BlockLayout\ControllerRouting\Plugin;
 
 use Siarko\ActionRouting\ActionManager;
 use Siarko\ActionRouting\ActionProvider\RouteData;
+use Siarko\BlockLayout\Api\Layout\ActiveLayoutListInterface;
 use Siarko\BlockLayout\ControllerRouting\Attribute\Layout;
-use Siarko\BlockLayout\XmlLayoutParser;
 use Siarko\Plugins\Config\Attribute\PluginMethod;
 use Siarko\Utils\Code\ClassStructureProvider;
 
@@ -17,11 +17,11 @@ class ActionLayouts
 
     /**
      * @param ClassStructureProvider $classStructureProvider
-     * @param XmlLayoutParser $layoutParser
+     * @param ActiveLayoutListInterface $layoutList
      */
     public function __construct(
         private readonly ClassStructureProvider $classStructureProvider,
-        private readonly XmlLayoutParser $layoutParser
+        private readonly ActiveLayoutListInterface $layoutList
     )
     {
     }
@@ -50,9 +50,9 @@ class ActionLayouts
     private function applyLayout(Layout $attribute): void
     {
         if($attribute->getBaseLayout()){
-            $this->layoutParser->setBaseLayoutId($attribute->getBaseLayout());
+            $this->layoutList->setBaseLayoutId($attribute->getBaseLayout());
         }
-        $this->layoutParser->enableModifierLayouts($attribute->getLayouts());
+        $this->layoutList->enableLayouts($attribute->getLayouts());
     }
 
 }

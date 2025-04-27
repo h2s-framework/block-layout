@@ -5,71 +5,94 @@ plugins:
   \Siarko\ActionRouting\ActionManager: \Siarko\BlockLayout\ControllerRouting\Plugin\ActionLayouts
 
 types:
-  \Siarko\BlockLayout\Api\LayoutProviderInterface: \Siarko\BlockLayout\LayoutProvider
+  \Siarko\BlockLayout\Api\Layout\BlockTypeProviderInterface: \Siarko\BlockLayout\Layout\BlockTypeProvider
+  \Siarko\BlockLayout\Api\Layout\BlockCollectionBuilderInterface: \Siarko\BlockLayout\Layout\BlockCollectionBuilder
+
+  \Siarko\BlockLayout\Api\Layout\ActiveLayoutListInterface: \Siarko\BlockLayout\Layout\ActiveLayoutList
+  \Siarko\BlockLayout\Api\Layout\LayoutSignatureProviderInterface: \Siarko\BlockLayout\Layout\LayoutSignatureProvider
+  \Siarko\BlockLayout\Api\LayoutProviderInterface: \Siarko\BlockLayout\Layout\LayoutProvider
   V\Siarko\BlockLayout\Cache\Layout: !new \Siarko\CacheFiles\Api\CacheSetInterface
   V\Siarko\BlockLayout\Cache\Layout\DirectoryProvider: !new \Siarko\Paths\Provider\ProjectPathProvider
+
+  \Siarko\BlockLayout\Api\Layout\StructureInterface: \Siarko\BlockLayout\Layout\Structure
+  \Siarko\BlockLayout\Api\Layout\Structure\MetaTagInterface: \Siarko\BlockLayout\Layout\Structure\MetaTag
+  \Siarko\BlockLayout\Api\Layout\Structure\NodeInterface: \Siarko\BlockLayout\Layout\Structure\Node
+
+  V\Siarko\BlockLayout\Layout\ConfigFileExtensionProvider: !new \Siarko\ConfigFiles\Provider\ConfigFileExtensionProvider
+  V\Siarko\BlockLayout\Layout\PoolLookup: !new \Siarko\Files\Lookup\PoolLookup
+  V\Siarko\BlockLayout\Layout\ConfigProvider: !new \Siarko\ConfigFiles\Provider\ScopedProvider
 arguments:
+  # Config (layout) reader setup
+  V\Siarko\BlockLayout\Layout\ConfigFileExtensionProvider:
+    extensions: [ xml ]
+  V\Siarko\BlockLayout\Layout\PoolLookup:
+    fileType: !const \Siarko\BlockLayout\Layout\LayoutLoader::PATH_PROVIDER_POOL_TYPE
+  V\Siarko\BlockLayout\Layout\ConfigProvider:
+    lookupScopeComparator: \Siarko\BlockLayout\Config\Provider\LookupScopeComparator
+    configFileNameProvider: \Siarko\BlockLayout\Config\Provider\LayoutFileNameProvider
+    extensionProvider: V\Siarko\BlockLayout\Layout\ConfigFileExtensionProvider
+    fileParserType: !const \Siarko\BlockLayout\Layout\LayoutLoader::DEFAULT_FILE_PARSER_TYPE
+    fileLookup: V\Siarko\BlockLayout\Layout\PoolLookup
+  # Config reader injection
+  \Siarko\BlockLayout\LayoutSorting\IncludeLayoutProcessor:
+    configProvider: V\Siarko\BlockLayout\Layout\ConfigProvider
+  \Siarko\BlockLayout\Layout\LayoutLoader:
+    configProvider: V\Siarko\BlockLayout\Layout\ConfigProvider
   # Cache configuration
   V\Siarko\BlockLayout\Cache\Layout\DirectoryProvider:
     path: generated/cache/layout
   V\Siarko\BlockLayout\Cache\Layout:
     cacheDirectory: V\Siarko\BlockLayout\Cache\Layout\DirectoryProvider
-  # Add cache to the cache manager
+  ## Add cache to the cache manager
   \Siarko\BlockLayout\Manager:
     caches:
       layout: V\Siarko\BlockLayout\Cache\Layout
-  \Siarko\BlockLayout\LayoutProvider:
+  \Siarko\BlockLayout\Layout\LayoutProvider:
     configCache: V\Siarko\BlockLayout\Cache\Layout
 
-  \Siarko\BlockLayout\XmlLayoutParser:
-    pathProviderPool: \Siarko\Paths\Provider\Pool\ScopedPathProviderPool
-  \Siarko\BlockLayout\ModifierLayout\Type\ModifierTypeProvider:
-    types:
-      includeLayout: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\IncludeLayoutModifier
-      block: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\BlockModifier
-      referenceBlock: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\ReferenceBlockModifier
-      delete: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\DeleteModifier
-      css: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\CssModifier
-      js: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\JsModifier
-      title: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\TitleModifier
-      base: \Siarko\BlockLayout\ModifierLayout\Type\Builtin\BaseModifier
-  \Siarko\BlockLayout\Block:
-    pathProviderPool: \Siarko\Paths\Provider\Pool\PathProviderPool
-    renderResultModifiers:
-      - \Siarko\BlockLayout\Template\RenderResultModifier\BlockTagResolver
+  \Siarko\BlockLayout\LayoutSorting\LoadedLayoutSorter:
+    processors:
+      - \Siarko\BlockLayout\LayoutSorting\IncludeLayoutProcessor
+  \Siarko\BlockLayout\ModifierLayout\ModifierProvider:
+    modifiers:
+      includeLayout: \Siarko\BlockLayout\ModifierLayout\Builtin\IncludeLayoutModifier
+      block: \Siarko\BlockLayout\ModifierLayout\Builtin\BlockModifier
+      data: \Siarko\BlockLayout\ModifierLayout\Builtin\DataModifier
+      referenceBlock: \Siarko\BlockLayout\ModifierLayout\Builtin\ReferenceBlockModifier
+      delete: \Siarko\BlockLayout\ModifierLayout\Builtin\DeleteModifier
+      css: \Siarko\BlockLayout\ModifierLayout\Builtin\CssModifier
+      js: \Siarko\BlockLayout\ModifierLayout\Builtin\JsModifier
+      title: \Siarko\BlockLayout\ModifierLayout\Builtin\TitleModifier
+      base: \Siarko\BlockLayout\ModifierLayout\Builtin\BaseModifier
   \Siarko\BlockLayout\Template\ContextualLoader:
     data:
         url: !type:object \Siarko\BlockLayout\Template\Tools\Url
-  \Siarko\BlockLayout\Definitions\TagParserManager:
-    parsers:
-      block: \Siarko\BlockLayout\Definitions\Builtin\Block
-      referenceBlock: \Siarko\BlockLayout\Definitions\Builtin\ReferenceBlock
-      title: \Siarko\BlockLayout\Definitions\Builtin\Title
-      base: \Siarko\BlockLayout\Definitions\Builtin\Base
-      js: \Siarko\BlockLayout\Definitions\Builtin\Js
-      css: \Siarko\BlockLayout\Definitions\Builtin\Css
-      includeLayout: \Siarko\BlockLayout\Definitions\Builtin\IncludeLayout
-      delete: \Siarko\BlockLayout\Definitions\Builtin\Delete
   \Siarko\BlockLayout\Template\DataNodeVariableParser:
     valueProviders:
-      - \Siarko\BlockLayout\Template\Variable\BaseUrlVariableProvider
+      BASE_URL: \Siarko\BlockLayout\Template\Variable\BaseUrlVariableProvider
   # Template provider for builtin custom blocks (module-relative paths)
   \Siarko\Paths\Provider\Pool\PathProviderPool:
     providers:
       template:
         - \Siarko\BlockLayout\Template\BuiltinTemplatePathProvider
+  \Siarko\BlockLayout\Blocks\Block:
+    layout: $CURRENT_LAYOUT
+    pathProviderPool: \Siarko\Paths\Provider\Pool\PathProviderPool
+    renderResultModifiers:
+      - \Siarko\BlockLayout\Template\RenderResultModifier\BlockTagResolver
   \Siarko\BlockLayout\Blocks\BuiltinBlock:
     templatePathProviders:
       - \Siarko\BlockLayout\Template\BuiltinTemplatePathProvider
   # Definition of block types
-  \Siarko\BlockLayout\Layout:
-    extraBlockTypeMap:
-      block: \Siarko\BlockLayout\Block
+  \Siarko\BlockLayout\Layout\BlockTypeProvider:
+    types:
+      block: \Siarko\BlockLayout\Blocks\Block
       css: \Siarko\BlockLayout\Blocks\CssLink
       js: \Siarko\BlockLayout\Blocks\JsBlock
       title: \Siarko\BlockLayout\Blocks\Title
       base: \Siarko\BlockLayout\Blocks\BaseUrl
 
+  # Extension for modules functionality - path providers
   \Siarko\Modules\Paths\ModulePathsProvider:
     pathTypes:
       layout: View/Layout

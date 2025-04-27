@@ -2,7 +2,7 @@
 
 namespace Siarko\BlockLayout\Template;
 
-use Siarko\BlockLayout\Template\Variable\DataNodeVariableValueProvider;
+use Siarko\BlockLayout\Api\Template\DataNodeVariableValueProvider;
 
 class DataNodeVariableParser
 {
@@ -15,10 +15,15 @@ class DataNodeVariableParser
     {
     }
 
+    /**
+     * @param string $name
+     * @param string $value
+     * @return string
+     */
     public function parse(string $name, string $value): string
     {
-        foreach ($this->valueProviders as $valueProvider) {
-            $value = str_replace($valueProvider->getName(), $valueProvider->getValue(), $value);
+        foreach ($this->valueProviders as $variableName => $valueProvider) {
+            $value = str_replace('$'.$variableName, $valueProvider->getValue(), $value);
         }
         return $value;
     }

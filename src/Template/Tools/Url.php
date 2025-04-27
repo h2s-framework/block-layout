@@ -26,7 +26,7 @@ class Url implements BlockArgumentInterface
      * @return string
      * @throws RootPathNotSet
      */
-    public function get(string $path): string
+    public function get(string $path = ""): string
     {
         return $this->urlProcessorManager->process($path, $this->urlProvider->getCurrentUrl());
     }

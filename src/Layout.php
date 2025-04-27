@@ -2,41 +2,21 @@
 
 namespace Siarko\BlockLayout;
 
-use Siarko\BlockLayout\Exception\UnknownBlockType;
-use Siarko\Api\Factory\FactoryProviderInterface;
+use Siarko\BlockLayout\Api\Layout\BlockCollectionBuilderInterface;
+use Siarko\BlockLayout\Blocks\Block;
+use Siarko\BlockLayout\Exception\TemplateFileNotFound;
 
 class Layout
 {
 
-    /**
-     * Set of assoc array data describing blocks
-     * @var array
-     */
-    private array $layoutStructure = [];
 
     /**
-     * Constructor functions constructing and returning blocks
-     * @var callable[]|Block[]
-     */
-    private array $blockList = [];
-
-    /**
-     * @param FactoryProviderInterface $factoryProvider
-     * @param array $extraBlockTypeMap
+     * @param array<callable|Block> $blockList
      */
     public function __construct(
-        protected readonly FactoryProviderInterface $factoryProvider,
-        protected readonly array $extraBlockTypeMap = []
+        private readonly array $blockList = []
     )
     {
-    }
-
-    /**
-     * @param array $blockStructure
-     * @return void
-     */
-    public function setLayoutStructure(array $blockStructure){
-        $this->layoutStructure = $blockStructure;
     }
 
     /**
@@ -52,71 +32,23 @@ class Layout
     }
 
     /**
-     * @return string
-     * @throws Exception\RootBlockNotFound
+     * @param array $ids
+     * @return array
      */
-    public function render(): string
+    public function getBlocks(array $ids): array
     {
-        $this->createBlocks();
-        $rootBlock = $this->getBlock('root');
-        return $rootBlock->render();
-    }
-
-    protected function getBlocks(string $type = 'block'): array
-    {
-        return $this->layoutStructure[$type];
+        return array_filter(array_map(fn($id) => $this->getBlock($id), $ids), fn($block) => $block !== null);
     }
 
     /**
-     * @return void
-     * @throws \Siarko\BlockLayout\Exception\RootBlockNotFound
+     * @return string
+     * @throws TemplateFileNotFound
      */
-    private function createBlocks()
+    public function render(): string
     {
-        if(!array_key_exists('root', $this->getBlocks())){
-            throw new \Siarko\BlockLayout\Exception\RootBlockNotFound();
-        }
-        $this->blockList = [];
-        foreach ($this->getBlocks() as $blockId => $blockData) {
-            if(array_key_exists($blockId, $this->getBlocks())){
-                $this->blockList[$blockId] = function() use ($blockId){
-                    return $this->createBlock($blockId);
-                };
-            }
-        }
+        $rootBlock = $this->getBlock(BlockCollectionBuilderInterface::ROOT_BLOCK_ID);
+        return $rootBlock->render();
     }
 
-    private function createBlock(string $blockId, string $type = 'block'): ?Block{
-        if(!array_key_exists($type, $this->extraBlockTypeMap)){
-            throw new UnknownBlockType($type);
-        }
-        $blockData = $this->getBlocks($type)[$blockId];
-        if(!array_key_exists('data', $blockData)){$blockData['data'] = [];}
-        $blockData['layout'] = $this;
-        $blockData['childBlockIds'] = $this->constructBlockChildren($blockData['children']);
-        /** @var Block $instance */
-        $instance = $this->factoryProvider->getFactory(
-            $this->extraBlockTypeMap[$type]
-        )?->create($blockData);
-        $instance->processAdditionalData($blockData);
-        return $instance;
-    }
-
-    protected function constructBlockChildren(array $blockChildren): array
-    {
-        $result = [];
-        foreach ($blockChildren as $childType => $childSet) {
-            foreach ($childSet as $childId) {
-                if(!array_key_exists($childId, $this->getBlocks($childType))){continue;}
-                $result[] = $childId;
-                if($childType == 'block'){ continue; }
-
-                $this->blockList[$childId] = function() use ($childId, $childType){
-                    return $this->createBlock($childId, $childType);
-                };
-            }
-        }
-        return $result;
-    }
 
 }

@@ -2,7 +2,7 @@
 
 namespace Siarko\BlockLayout\Argument;
 
-use Siarko\BlockLayout\Block;
+use Siarko\BlockLayout\Blocks\Block;
 
 interface BlockAwareArgumentInterface extends BlockArgumentInterface
 {

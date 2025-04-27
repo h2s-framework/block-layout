@@ -2,7 +2,6 @@
 
 namespace Siarko\BlockLayout\Exception;
 
-use Siarko\BlockLayout\Block;
 use Throwable;
 
 class TemplateFileNotFound extends \Exception

@@ -2,25 +2,31 @@
 
 namespace Siarko\BlockLayout\Blocks;
 
-use Siarko\Paths\Provider\AbstractPathProvider;
+use Siarko\BlockLayout\Api\Layout\Definitions\TitleInterface;
+use Siarko\Utils\Exceptions\TypeCastException;
 
-class Title extends BuiltinBlock
+class Title extends Block
 {
     public function getTemplateId(): ?string
     {
-        if($this->id === \Siarko\BlockLayout\Definitions\Builtin\Title::BLOCK_ID){
-            return parent::getTemplateId() ?? 'title';
+        if($this->id === TitleInterface::BLOCK_ID){
+            return parent::getTemplateId() ?? TitleInterface::BLOCK_ID;
         }
         return null;
     }
 
 
-    public function processAdditionalData(array $describerData)
+    /**
+     * @param array $describerData
+     * @return void
+     * @throws TypeCastException
+     */
+    public function processAdditionalData(array $describerData): void
     {
-        $this->updateTemplateData($this->dataNodeFactory->create([
-            'name' => 'text',
-            'type' => 'string',
-            'value' => $describerData['text']
-        ]));
+        $this->updateTemplateData([$this->dataNodeFactory->createNamed(
+            name: TitleInterface::ATTRIBUTE_TEXT,
+            type: 'string',
+            value: $describerData[TitleInterface::ATTRIBUTE_TEXT]
+        )]);
     }
 }

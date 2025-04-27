@@ -2,16 +2,14 @@
 
 namespace Siarko\BlockLayout\ModifierLayout;
 
-use Siarko\BlockLayout\ModifierLayout\Type\IModifierType;
-
 class Sorter
 {
 
     /**
-     * @param Type\ModifierTypeProvider $modifierTypeProvider
+     * @param ModifierProvider $modifierTypeProvider
      */
     public function __construct(
-        private readonly \Siarko\BlockLayout\ModifierLayout\Type\ModifierTypeProvider $modifierTypeProvider
+        private readonly ModifierProvider $modifierTypeProvider
     )
     {
     }
@@ -19,7 +17,7 @@ class Sorter
     public function sort(array $modifier): array
     {
         uksort($modifier, function($a, $b){
-            return $this->modifierTypeProvider->getType($a)->getPriority() - $this->modifierTypeProvider->getType($b)->getPriority();
+            return $this->modifierTypeProvider->getModifier($a)->getPriority() - $this->modifierTypeProvider->getModifier($b)->getPriority();
         });
         return $modifier;
     }

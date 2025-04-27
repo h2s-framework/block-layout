@@ -3,7 +3,9 @@
 namespace Siarko\BlockLayout\Blocks;
 
 
-class BaseUrl extends BuiltinBlock
+use Siarko\BlockLayout\Api\Layout\Definitions\BaseInterface;
+
+class BaseUrl extends Block
 {
 
     public function getTemplateId(): ?string
@@ -13,16 +15,16 @@ class BaseUrl extends BuiltinBlock
     public function processAdditionalData(array $describerData)
     {
         $this->updateTemplateData([
-            $this->dataNodeFactory->create([
-                'name' => 'href',
-                'type' => 'string',
-                'value' => $describerData['href']
-            ]),
-            $this->dataNodeFactory->create([
-                'name' => 'target',
-                'type' => 'string',
-                'value' =>  $describerData['target'] ?? '_self'
-            ])
+            $this->dataNodeFactory->createNamed(
+                name: BaseInterface::ATTRIBUTE_HREF,
+                type: 'string',
+                value: $describerData[BaseInterface::ATTRIBUTE_HREF],
+            ),
+            $this->dataNodeFactory->createNamed(
+                name: BaseInterface::ATTRIBUTE_TARGET,
+                type: 'string',
+                value:  $describerData[BaseInterface::ATTRIBUTE_TARGET] ?? '_self',
+            ),
         ]);
     }
 }

@@ -2,18 +2,13 @@
 
 namespace Siarko\BlockLayout\Blocks;
 
-use Siarko\Api\State\AppMode;
 use Siarko\Api\State\AppState;
-use Siarko\BlockLayout\Definitions\Builtin\Js;
+use Siarko\BlockLayout\Api\Layout\Definitions\JsInterface;
 use Siarko\DependencyManager\Attributes\InjectField;
-use Siarko\Utils\Strings;
 
-class JsBlock extends BuiltinBlock
+class JsBlock extends Block
 {
 
-    public const SCRIPT_TYPE_ARGUMENT = 'type';
-
-    public const SCRIPT_HREF_ARGUMENT = 'href';
 
     #[InjectField]
     protected AppState $appState;
@@ -32,21 +27,18 @@ class JsBlock extends BuiltinBlock
      */
     public function processAdditionalData(array $describerData)
     {
-        if($this->appState->isAppMode(AppMode::DEV)){
-            $describerData[self::SCRIPT_HREF_ARGUMENT] .= '?__='.Strings::generateRandomString();
-        }
-        $templateData = [$this->dataNodeFactory->create([
-            'name' => self::SCRIPT_HREF_ARGUMENT,
-            'type' => 'string',
-            'value' => $describerData[self::SCRIPT_HREF_ARGUMENT]
-        ])];
-        $scriptType = $describerData[Js::SCRIPT_TYPE_ARGUMENT] ?? 'application/javascript';
-        $templateData[] = $this->dataNodeFactory->create([
-            'name' => self::SCRIPT_TYPE_ARGUMENT,
-            'type' => 'string',
-            'value' => $scriptType
+        $this->updateTemplateData([
+            $this->dataNodeFactory->createNamed(
+                name: JsInterface::ATTRIBUTE_HREF,
+                type: 'string',
+                value: $describerData[JsInterface::ATTRIBUTE_HREF]
+            ),
+            $this->dataNodeFactory->createNamed(
+                name: JsInterface::ATTRIBUTE_TYPE,
+                type: 'string',
+                value: $describerData[JsInterface::ATTRIBUTE_TYPE] ?? 'text/javascript'
+            )
         ]);
-        $this->updateTemplateData($templateData);
     }
 
 }

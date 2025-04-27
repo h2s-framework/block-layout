@@ -7,7 +7,7 @@ class Applier
 
     public function __construct(
         private readonly Sorter $modifierSorter,
-        private readonly \Siarko\BlockLayout\ModifierLayout\Type\ModifierTypeProvider $modifierTypeProvider
+        private readonly ModifierProvider $modifierTypeProvider
     )
     {
     }
@@ -16,7 +16,7 @@ class Applier
         $layoutModifierSet = $this->modifierSorter->sort($layoutModifierSet);
         foreach ($layoutModifierSet as $modifierType => $modifiers) {
             foreach ($modifiers as $modifier) {
-                $type = $this->modifierTypeProvider->getType($modifierType);
+                $type = $this->modifierTypeProvider->getModifier($modifierType);
                 $mainLayout = $type->apply($mainLayout, $modifier);
             }
         }

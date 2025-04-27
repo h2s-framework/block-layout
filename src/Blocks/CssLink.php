@@ -2,12 +2,12 @@
 
 namespace Siarko\BlockLayout\Blocks;
 
-use Siarko\Api\State\AppMode;
 use Siarko\Api\State\AppState;
+use Siarko\BlockLayout\Api\Layout\Definitions\LinkedBlockInterface;
 use Siarko\DependencyManager\Attributes\InjectField;
-use Siarko\Utils\Strings;
+use Siarko\Utils\Exceptions\TypeCastException;
 
-class CssLink extends BuiltinBlock
+class CssLink extends Block
 {
 
     /**
@@ -23,17 +23,15 @@ class CssLink extends BuiltinBlock
     /**
      * @param array $describerData
      * @return void
+     * @throws TypeCastException
      */
     public function processAdditionalData(array $describerData)
     {
-        if($this->appState->isAppMode(AppMode::DEV)){
-            $describerData['href'] .= '?__='.Strings::generateRandomString();
-        }
-        $this->updateTemplateData($this->dataNodeFactory->create([
-            'name' => 'href',
+        $this->updateTemplateData([$this->dataNodeFactory->create([
+            'name' => LinkedBlockInterface::ATTRIBUTE_HREF,
             'type' => 'string',
-            'value' => $describerData['href']
-        ]));
+            'value' => $describerData[LinkedBlockInterface::ATTRIBUTE_HREF]
+        ])]);
     }
 
 }
